@@ -1,11 +1,13 @@
 package helper;
 
 import com.badlogic.gdx.physics.box2d.*;
+import objects.player.Adventurer;
 
 public class ObjectsContactListener implements ContactListener {
 
-    private Object objectA;
-    private Object objectB;
+    protected Object objectA;
+    protected Object objectB;
+    public Object lastAdventurerContact;
 
     @Override
     public void beginContact(Contact contact) {
@@ -17,6 +19,11 @@ public class ObjectsContactListener implements ContactListener {
 
         objectA = fixtureA.getUserData();
         objectB = fixtureB.getUserData();
+
+        if (objectA instanceof Adventurer)
+            lastAdventurerContact = objectB;
+        if (objectB instanceof Adventurer)
+            lastAdventurerContact = objectA;
     }
 
     @Override
@@ -29,6 +36,7 @@ public class ObjectsContactListener implements ContactListener {
 
         objectA = null;
         objectB = null;
+        lastAdventurerContact = null;
     }
 
     @Override

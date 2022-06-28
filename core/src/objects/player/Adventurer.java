@@ -1,6 +1,7 @@
 package objects.player;
 
 import com.adventurer.game.GameScreen;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
@@ -44,7 +45,7 @@ public class Adventurer extends GameEntity {
         BOTTOM
     }
 
-    private enum BodyState {
+    public enum BodyState {
         LANDED,
         FLYING
     }
@@ -77,6 +78,7 @@ public class Adventurer extends GameEntity {
     public CustomInputProcessor inputProcessor;
     public ObjectsContactListener contactListener;
     public Object objectInHands;
+    public Object lastContact;
 
     public Adventurer(Vector2 position, Dimension size, World world, GameLevel level) {
         super(position, size, world);
@@ -91,6 +93,8 @@ public class Adventurer extends GameEntity {
 
     @Override
     public void update() {
+        lastContact = contactListener.lastAdventurerContact;
+
         if (contactListener.isContactDetected()) {
             Object objectA = contactListener.getObjectA();
             Object objectB = contactListener.getObjectB();
@@ -101,34 +105,6 @@ public class Adventurer extends GameEntity {
         }
         if (adventurerState != AdventurerState.DEAD) {
             position = new Vector2(body.getPosition().x * PIXELS_PER_METER, body.getPosition().y * PIXELS_PER_METER);
-
-            if (body.getLinearVelocity().y <= 0 && bodyState == BodyState.LANDED)
-                bodyState = BodyState.FLYING;
-
-            if (adventurerState != AdventurerState.CROUCHING && adventurerState != AdventurerState.CLIMB && adventurerState != AdventurerState.HANG) {
-                float onGroundValue = 0.000000009f;
-                if (contactListener.isContactDetected()) {
-                    if (contactListener.getObjectA().equals(this) && contactListener.getObjectB() instanceof GameMapObject) {
-                        onGroundValue += Math.abs(((GameMapObject) contactListener.getObjectB()).getBody().getLinearVelocity().y);
-                        //System.out.println(((GameMapObject) contactListener.getObjectB()).getBody().getLinearVelocity().y + " " + body.getLinearVelocity().y);
-                    } else if (contactListener.getObjectB().equals(this) && contactListener.getObjectA() instanceof GameMapObject) {
-                        onGroundValue += Math.abs(((GameMapObject) contactListener.getObjectA()).getBody().getLinearVelocity().y);
-                        //System.out.println(((GameMapObject) contactListener.getObjectA()).getBody().getLinearVelocity().y + " " + body.getLinearVelocity().y);
-                    }
-                }
-                if (Math.abs(body.getLinearVelocity().y) < onGroundValue) {
-                    switch (bodyState) {
-                        case LANDED:
-                            bodyState = BodyState.FLYING;
-                            break;
-                        case FLYING:
-                            bodyInert = false;
-                            bodyState = BodyState.LANDED;
-                            setState(AdventurerState.STAY);
-                            break;
-                    }
-                }
-            }
 
             if (objectInHands != null) {
                 if (objectInHands instanceof Body) {
@@ -246,6 +222,12 @@ public class Adventurer extends GameEntity {
 
     public AdventurerState getState() { return adventurerState; }
 
+    public void setBodyInert(boolean bodyInert) { this.bodyInert = bodyInert; }
+
+    public void setBodyState(BodyState bodyState) { this.bodyState = bodyState; }
+
+    public BodyState getBodyState() { return bodyState; }
+
     public void setDirection(AdventurerDirection adventurerDirection) {
         if ((adventurerDirection == AdventurerDirection.LEFT || adventurerDirection == AdventurerDirection.RIGHT) && adventurerDirection != this.adventurerDirection) {
             for (Map.Entry<AdventurerState, AdventurerAnimation> entry : adventurerAnimations.entrySet()) {
@@ -292,7 +274,7 @@ public class Adventurer extends GameEntity {
     public void interactWithKeyboard() {
         velocityX = 0;
 
-        if (Gdx.input.isKeyPressed(Input.Keys.UP) && adventurerState != AdventurerState.JUMP && adventurerState != AdventurerState.CROUCHING && adventurerState != AdventurerState.CLIMB && bodyState == BodyState.LANDED && canJump) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && adventurerState != AdventurerState.JUMP && adventurerState != AdventurerState.CROUCHING && adventurerState != AdventurerState.CLIMB && bodyState == BodyState.LANDED && canJump) {
             if (adventurerState != AdventurerState.HANG) {
                 setState(AdventurerState.JUMP);
                 float force = body.getMass() * 25;
@@ -327,7 +309,7 @@ public class Adventurer extends GameEntity {
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            if (bodyState == BodyState.LANDED && adventurerState != AdventurerState.CROUCHING && adventurerState != AdventurerState.HANG) {
+            if (bodyState == BodyState.LANDED && adventurerState != AdventurerState.CROUCHING && adventurerState != AdventurerState.HANG && adventurerState != AdventurerState.CLIMB) {
                 setState(AdventurerState.CROUCHING);
                 size.height /= 2;
                 body.setTransform(new Vector2(body.getPosition().x, body.getPosition().y - size.height / 2.0f / PIXELS_PER_METER), 0);
@@ -376,34 +358,18 @@ public class Adventurer extends GameEntity {
         }
 
         if (inputProcessor.keysStates.get(Input.Keys.SHIFT_LEFT)) {
-            if (contactListener.isContactDetected() && adventurerState != AdventurerState.HANG) {
-                Object objectA = contactListener.getObjectA();
-                Object objectB = contactListener.getObjectB();
+            if (adventurerState != AdventurerState.HANG && contactListener.isContactDetected()) {
                 if (objectInHands == null) {
-                    if (objectA.equals(this) && objectB instanceof Body) {
-                        if (((Body) objectB).getUserData() instanceof Rope) {
-                            Body ropeItem = (Body) objectB;
+                    if (lastContact instanceof Body) {
+                        if (((Body) lastContact).getUserData() instanceof Rope) {
+                            Body ropeItem = (Body) lastContact;
                             objectInHands = ropeItem;
                             this.body.setTransform(new Vector2(ropeItem.getPosition().x, ropeItem.getPosition().y), ropeItem.getAngle());
                             setState(AdventurerState.HANG);
                             setDirection((adventurerDirection == AdventurerDirection.LEFT) ? AdventurerDirection.RIGHT : AdventurerDirection.LEFT);
                         }
-                    } else if (objectA instanceof Body && objectB.equals(this)) {
-                        if (((Body) objectA).getUserData() instanceof Rope) {
-                            Body ropeItem = (Body) objectA;
-                            objectInHands = ropeItem;
-                            this.body.setTransform(new Vector2(ropeItem.getPosition().x, ropeItem.getPosition().y), ropeItem.getAngle());
-                            setState(AdventurerState.HANG);
-                            setDirection((adventurerDirection == AdventurerDirection.LEFT) ? AdventurerDirection.RIGHT : AdventurerDirection.LEFT);
-                        }
-                    } else if (objectA.equals(this) && objectB instanceof Box) {
-                        Box box = (Box) objectB;
-                        box.getBody().setActive(false);
-                        int adventureDirectionCoefficient = adventurerDirection == AdventurerDirection.LEFT ? -1 : (adventurerDirection == AdventurerDirection.RIGHT ? 1 : 0);
-                        box.getBody().setTransform(new Vector2(body.getPosition().x + adventureDirectionCoefficient * (size.width / 2.0f / PIXELS_PER_METER + box.getDimension().width / 2.0f / PIXELS_PER_METER), body.getPosition().y + box.getDimension().height / 2.0f / PIXELS_PER_METER), 0);
-                        objectInHands = box;
-                    } else if (objectA instanceof Box && objectB.equals(this)) {
-                        Box box = (Box) objectA;
+                    } else if (lastContact instanceof Box) {
+                        Box box = (Box) lastContact;
                         box.getBody().setActive(false);
                         int adventureDirectionCoefficient = adventurerDirection == AdventurerDirection.LEFT ? -1 : (adventurerDirection == AdventurerDirection.RIGHT ? 1 : 0);
                         box.getBody().setTransform(new Vector2(body.getPosition().x + adventureDirectionCoefficient * (size.width / 2.0f / PIXELS_PER_METER + box.getDimension().width / 2.0f / PIXELS_PER_METER), body.getPosition().y + box.getDimension().height / 2.0f / PIXELS_PER_METER), 0);

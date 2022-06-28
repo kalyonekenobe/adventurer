@@ -38,7 +38,7 @@ public class Level1 extends GameLevel {
     }
 
     private void initializeMapObjects() {
-        adventurer = new Adventurer(new Vector2(2048, 320), new Dimension(30, 62), gameScreen.getWorld(), this);
+        adventurer = new Adventurer(new Vector2(1020, 320), new Dimension(30, 62), gameScreen.getWorld(), this);
         adventurer.setMap(map);
         adventurer.setContactListener((ObjectsContactListener) gameScreen.getContactListener());
         mapObjects.add(new Rope(gameScreen.getWorld(), new Vector2(500, 700), new Dimension(32, 32), new Dimension(4, 16), 20));

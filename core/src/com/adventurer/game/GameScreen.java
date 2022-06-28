@@ -85,7 +85,7 @@ public class GameScreen implements Screen {
         game.batch.end();
 
 
-        box2DDebugRenderer.render(world, camera.combined.scl(PIXELS_PER_METER));
+        //box2DDebugRenderer.render(world, camera.combined.scl(PIXELS_PER_METER));
     }
 
     @Override

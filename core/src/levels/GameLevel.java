@@ -3,7 +3,7 @@ package levels;
 import com.adventurer.game.GameScreen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import helper.BodyHelper;
@@ -103,8 +104,33 @@ public abstract class GameLevel {
             }
         }
 
-        if (adventurer.getState() != Adventurer.AdventurerState.CLIMB && !adventurer.inputProcessor.keysStates.get(Input.Keys.UP) && !adventurer.getCanJumpState()) {
-            adventurer.setCanJumpState(true);
+        boolean adventurerOnGround = false;
+        for (GameMapObject mapObject : mapObjects) {
+            if (mapObject.getBody() != null && adventurer.getState() != Adventurer.AdventurerState.HANG && adventurer.getState() != Adventurer.AdventurerState.CLIMB && adventurer.getState() != Adventurer.AdventurerState.CROUCHING) {
+                Polygon objectPolygon = new Polygon(BodyHelper.getBodyVertices(mapObject.getBody()));
+                Polygon adventurerPolygon = new Polygon(BodyHelper.getBodyVertices(adventurer.getBody()));
+                Vector2 position = mapObject.getBody().getType() == BodyDef.BodyType.DynamicBody ? mapObject.getBody().getPosition() : mapObject.getPosition();
+                objectPolygon.setOrigin(position.x * PIXELS_PER_METER, position.y * PIXELS_PER_METER);
+                objectPolygon.setRotation(mapObject.getBody().getAngle() / (float)Math.PI * 180);
+                Vector2 pointA = new Vector2(adventurer.getBody().getPosition().x * PIXELS_PER_METER - adventurer.getWidth() / 2.0f, adventurer.getBody().getPosition().y * PIXELS_PER_METER - adventurer.getHeight() / 2.0f - 1);
+                Vector2 pointB = new Vector2(adventurer.getBody().getPosition().x * PIXELS_PER_METER + adventurer.getWidth() / 2.0f, adventurer.getBody().getPosition().y * PIXELS_PER_METER - adventurer.getHeight() / 2.0f - 1);
+                if (Intersector.overlapConvexPolygons(new Polygon(new float[] { pointA.x, pointA.y, pointB.x, pointB.y, pointB.x, pointB.y, pointA.x, pointA.y }), objectPolygon)) {
+                    adventurer.setState(Adventurer.AdventurerState.STAY);
+                    if (adventurer.getBodyState() != Adventurer.BodyState.LANDED) {
+                        adventurer.setBodyInert(false);
+                        adventurer.setBodyState(Adventurer.BodyState.LANDED);
+                        adventurer.setCanJumpState(true);
+                    }
+                    adventurerOnGround = true;
+                }
+            }
+        }
+
+        if (!adventurerOnGround) {
+            if (adventurer.getBodyState() != Adventurer.BodyState.FLYING) {
+                adventurer.setBodyState(Adventurer.BodyState.FLYING);
+                adventurer.setCanJumpState(false);
+            }
         }
 
         for (GameMapObject object : mapObjects) {

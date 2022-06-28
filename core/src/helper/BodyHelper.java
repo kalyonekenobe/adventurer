@@ -94,6 +94,8 @@ public class BodyHelper {
         } else if (body.getUserData() instanceof GameMapObject) {
             size = ((GameMapObject) body.getUserData()).getDimension();
             position = new Vector2(((GameMapObject) body.getUserData()).getPosition().x * PIXELS_PER_METER, ((GameMapObject) body.getUserData()).getPosition().y * PIXELS_PER_METER);
+            if (((GameMapObject) body.getUserData()).getBody().getType() == BodyDef.BodyType.DynamicBody)
+                position = new Vector2(((GameMapObject) body.getUserData()).getBody().getPosition().x * PIXELS_PER_METER - ((GameMapObject) body.getUserData()).getDimension().width / 2.0f, ((GameMapObject) body.getUserData()).getBody().getPosition().y * PIXELS_PER_METER - ((GameMapObject) body.getUserData()).getDimension().height / 2.0f);
         }
         vertices[0] = position.x;
         vertices[1] = position.y;

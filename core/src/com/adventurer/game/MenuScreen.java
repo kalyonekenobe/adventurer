@@ -22,6 +22,7 @@ public class MenuScreen implements Screen {
 
     public static final Texture logo = new Texture("logo_dark.jpg");
     public static final Texture menuBoard = new Texture("menu_board.png");
+    public static final Texture gameLogo = new Texture("game_logo.png");
 
     public static final Sound menuSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/menu.mp3"));
 
@@ -54,6 +55,7 @@ public class MenuScreen implements Screen {
         batch.draw(logo, 0, 0);
         int windowWidth = Gdx.graphics.getWidth();
         int windowHeight = Gdx.graphics.getHeight();
+        batch.draw(gameLogo, (windowWidth - 500) / 2.0f, 300 + (windowHeight - 100) / 2.0f, 500, 100);
         batch.draw(menuBoard, (windowWidth - menuBoard.getWidth()) / 2.0f, (windowHeight - menuBoard.getHeight()) / 2.0f);
         for (MenuButton button : buttons) {
             batch.draw(button.getTexture(), button.getLocation().x, button.getLocation().y, button.getSize().width, button.getSize().height);

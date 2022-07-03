@@ -12,6 +12,7 @@ public class DesktopLauncher {
 		config.setForegroundFPS(60);
 		config.setTitle("Adventurer");
 		config.setWindowSizeLimits(500, 500, 1920, 1080);
+		//config.setWindowedMode(1920, 1080);
 		config.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());
 		new Lwjgl3Application(new AdventurerGame(), config);
 	}

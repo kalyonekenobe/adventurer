@@ -9,7 +9,7 @@ import helper.CustomInputProcessor;
 public class AdventurerGame extends Game {
 
     public SpriteBatch batch;
-    public int levelId = 5;
+    public int levelId = 1;
 
     @Override
     public void create() {

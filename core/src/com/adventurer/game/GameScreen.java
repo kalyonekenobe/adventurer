@@ -6,6 +6,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -16,18 +17,18 @@ import com.badlogic.gdx.physics.box2d.World;
 import helper.BodyHelper;
 import helper.MapHelper;
 import helper.ObjectsContactListener;
-import levels.GameLevel;
-import levels.Level1;
+import levels.*;
 
 import static helper.Constants.PIXELS_PER_METER;
 
 public class GameScreen implements Screen {
 
-    private final AdventurerGame game;
+    public final AdventurerGame game;
     private final World world;
     private final Box2DDebugRenderer box2DDebugRenderer;
     private final OrthographicCamera camera;
     private final ObjectsContactListener contactListener;
+    private SpriteBatch batch;
 
     private float stateTime;
 
@@ -35,21 +36,39 @@ public class GameScreen implements Screen {
     private OrthogonalTiledMapRenderer orthogonalTiledMapRenderer;
     private TiledMap map;
 
-    public GameScreen(AdventurerGame game) {
+    public GameScreen(AdventurerGame game, int levelId) {
         this.camera = new OrthographicCamera();
         this.world = new World(new Vector2(0, -50f), false);
         this.contactListener = new ObjectsContactListener();
         this.world.setContactListener(contactListener);
         this.box2DDebugRenderer = new Box2DDebugRenderer();
+        this.batch = new SpriteBatch();
         this.game = game;
+        switch (levelId) {
+            case 1:
+                this.level = new Level1(this);
+                break;
+            case 2:
+                this.level = new Level2(this);
+                break;
+            case 3:
+                this.level = new Level3(this);
+                break;
+            case 4:
+                this.level = new Level4(this);
+                break;
+            case 5:
+                this.level = new Level5(this);
+                break;
+        }
     }
 
     @Override
     public void show() {
-        this.level = new Level1(this);
         this.orthogonalTiledMapRenderer = level.getOrthogonalTiledMapRenderer();
         this.map = level.getMap();
         camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        MenuScreen.menuSound.stop();
     }
 
     private void update() {
@@ -58,7 +77,7 @@ public class GameScreen implements Screen {
         world.step(Gdx.graphics.getDeltaTime(), 8, 3);
         cameraUpdate();
 
-        game.batch.setProjectionMatrix(camera.combined);
+        batch.setProjectionMatrix(camera.combined);
         orthogonalTiledMapRenderer.setView(camera);
     }
 
@@ -67,6 +86,7 @@ public class GameScreen implements Screen {
         position.x = Math.max(level.getAdventurer().getBody().getPosition().x * PIXELS_PER_METER, Gdx.graphics.getWidth() / 2.0f);
         position.x = Math.min(map.getProperties().get("width", Integer.class) * PIXELS_PER_METER - Gdx.graphics.getWidth() / 2.0f, position.x);
         position.y = Math.max(level.getAdventurer().getBody().getPosition().y * PIXELS_PER_METER, Gdx.graphics.getHeight() / 2.0f);
+        position.y = Math.min(map.getProperties().get("height", Integer.class) * PIXELS_PER_METER - Gdx.graphics.getHeight() / 2.0f, position.y);
         camera.position.set(position);
         camera.update();
     }
@@ -79,10 +99,11 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 
-        game.batch.begin();
-        level.render(game.batch, stateTime);
+        batch.begin();
+        level.render(batch, stateTime);
         orthogonalTiledMapRenderer.render();
-        game.batch.end();
+        level.renderAdventurerHealth(batch, stateTime);
+        batch.end();
 
 
         //box2DDebugRenderer.render(world, camera.combined.scl(PIXELS_PER_METER));

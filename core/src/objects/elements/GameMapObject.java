@@ -13,7 +13,7 @@ public abstract class GameMapObject {
     protected Dimension dimension;
     protected Body body;
 
-    public abstract void render(SpriteBatch batch);
+    public abstract void render(SpriteBatch batch, float stateTime);
 
     public void setBody(Body body) { this.body = body; }
 

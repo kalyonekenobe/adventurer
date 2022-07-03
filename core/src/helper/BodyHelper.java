@@ -8,10 +8,7 @@ import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.physics.box2d.joints.RopeJointDef;
 import com.badlogic.gdx.utils.Array;
-import objects.elements.Box;
-import objects.elements.GameMapObject;
-import objects.elements.Ground;
-import objects.elements.Ladder;
+import objects.elements.*;
 import objects.player.Adventurer;
 
 import java.awt.*;
@@ -98,13 +95,17 @@ public class BodyHelper {
                 position = new Vector2(((GameMapObject) body.getUserData()).getBody().getPosition().x * PIXELS_PER_METER - ((GameMapObject) body.getUserData()).getDimension().width / 2.0f, ((GameMapObject) body.getUserData()).getBody().getPosition().y * PIXELS_PER_METER - ((GameMapObject) body.getUserData()).getDimension().height / 2.0f);
         }
         vertices[0] = position.x;
-        vertices[1] = position.y;
+        vertices[1] = position.y - 1;
         vertices[2] = position.x;
         vertices[3] = position.y + size.height;
-        vertices[4] = position.x + size.width;
+        vertices[4] = position.x + size.width + 1;
         vertices[5] = position.y + size.height;
-        vertices[6] = position.x + size.width;
-        vertices[7] = position.y;
+        vertices[6] = position.x + size.width + 1;
+        vertices[7] = position.y - 1;
+        if (body.getUserData() instanceof Bomb) {
+            vertices[3] += 2;
+            vertices[5] += 2;
+        }
         return vertices;
     }
 }

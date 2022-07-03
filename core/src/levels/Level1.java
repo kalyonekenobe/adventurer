@@ -13,10 +13,7 @@ import com.badlogic.gdx.utils.Array;
 import helper.BodyHelper;
 import helper.MapHelper;
 import helper.ObjectsContactListener;
-import objects.elements.Box;
-import objects.elements.GameMapObject;
-import objects.elements.Ladder;
-import objects.elements.Rope;
+import objects.elements.*;
 import objects.player.Adventurer;
 
 import java.awt.*;
@@ -29,7 +26,7 @@ public class Level1 extends GameLevel {
 
     public Level1(GameScreen gameScreen) {
         this.mapObjects = new Array<>();
-        this.mapPathName = "Maps/MapTest.tmx";
+        this.mapPathName = "Maps/Level1.tmx";
         this.gameScreen = gameScreen;
         this.mapHelper = new MapHelper(this);
         this.orthogonalTiledMapRenderer = this.mapHelper.setupMap(mapPathName);
@@ -38,23 +35,22 @@ public class Level1 extends GameLevel {
     }
 
     private void initializeMapObjects() {
-        adventurer = new Adventurer(new Vector2(1020, 320), new Dimension(30, 62), gameScreen.getWorld(), this);
+        adventurer = new Adventurer(new Vector2(160, 160), new Dimension(30, 62), gameScreen.getWorld(), this, 5);
         adventurer.setMap(map);
         adventurer.setContactListener((ObjectsContactListener) gameScreen.getContactListener());
-        mapObjects.add(new Rope(gameScreen.getWorld(), new Vector2(500, 700), new Dimension(32, 32), new Dimension(4, 16), 20));
-        mapObjects.add(new Rope(gameScreen.getWorld(), new Vector2(800, 700), new Dimension(32, 32), new Dimension(4, 16), 15));
-        mapObjects.add(new Rope(gameScreen.getWorld(), new Vector2(100, 500), new Dimension(32, 32), new Dimension(4, 16), 18));
-        mapObjects.add(new Rope(gameScreen.getWorld(), new Vector2(1000, 960), new Dimension(32, 32), new Dimension(4, 16), 35));
-        mapObjects.add(new Rope(gameScreen.getWorld(), new Vector2(1808, 816), new Dimension(32, 32), new Dimension(4, 16), 32));
-        mapObjects.add(new Rope(gameScreen.getWorld(), new Vector2(2164, 916), new Dimension(32, 32), new Dimension(4, 16), 16));
-        mapObjects.add(new Box(new Vector2(2560, 128), new Dimension(64, 64), getWorld()));
-        mapObjects.add(new Box(new Vector2(2560, 160), new Dimension(64, 64), getWorld()));
-        mapObjects.add(new Box(new Vector2(2560, 192), new Dimension(64, 64), getWorld()));
-        mapObjects.add(new Box(new Vector2(2560, 224), new Dimension(64, 64), getWorld()));
-        mapObjects.add(new Box(new Vector2(2560, 256), new Dimension(64, 64), getWorld()));
-        mapObjects.add(new Box(new Vector2(2560, 288), new Dimension(64, 64), getWorld()));
-        mapObjects.add(new Box(new Vector2(2560, 320), new Dimension(64, 64), getWorld()));
-        mapObjects.add(new Box(new Vector2(2560, 352), new Dimension(64, 64), getWorld()));
+        mapObjects.add(new Rope(gameScreen.getWorld(), new Vector2(976, 560), new Dimension(32, 32), new Dimension(4, 16), 15));
+        mapObjects.add(new Rope(gameScreen.getWorld(), new Vector2(1616, 880), new Dimension(32, 32), new Dimension(4, 16), 35));
+        mapObjects.add(new Rope(gameScreen.getWorld(), new Vector2(2000, 880), new Dimension(32, 32), new Dimension(4, 16), 20));
+        mapObjects.add(new Box(new Vector2(2624, 160), new Dimension(32, 32), getWorld()));
+        mapObjects.add(new Box(new Vector2(2592, 160), new Dimension(32, 32), getWorld()));
+        mapObjects.add(new Box(new Vector2(2624, 192), new Dimension(32, 32), getWorld()));
+        mapObjects.add(new Box(new Vector2(2592, 192), new Dimension(32, 32), getWorld()));
+        mapObjects.add(new Box(new Vector2(2624, 226), new Dimension(32, 32), getWorld()));
+        mapObjects.add(new Box(new Vector2(2592, 226), new Dimension(32, 32), getWorld()));
+        mapObjects.add(new Coin(new Vector2(656, 192), new Dimension(32, 32), getWorld()));
+        mapObjects.add(new Coin(new Vector2(1696, 704), new Dimension(32, 32), getWorld()));
+        mapObjects.add(new Coin(new Vector2(2304, 192), new Dimension(32, 32), getWorld()));
+        this.totalCoins = 3;
     }
 
     @Override

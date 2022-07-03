@@ -14,5 +14,5 @@ public class Bomb extends GameMapObject {
     }
 
     @Override
-    public void render(SpriteBatch batch) { }
+    public void render(SpriteBatch batch, float stateTime) { }
 }

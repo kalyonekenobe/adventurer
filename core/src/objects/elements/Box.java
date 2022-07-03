@@ -26,7 +26,7 @@ public class Box extends GameMapObject {
     }
 
     @Override
-    public void render(SpriteBatch batch) {
+    public void render(SpriteBatch batch, float stateTime) {
         batch.draw(texture, body.getPosition().x * PIXELS_PER_METER - dimension.width / 2.0f, body.getPosition().y * PIXELS_PER_METER - dimension.height / 2.0f, dimension.width / 2.0f, dimension.height / 2.0f, dimension.width, dimension.height, 1, 1, body.getAngle() / (float)Math.PI * 180);
     }
 }

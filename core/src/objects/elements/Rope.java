@@ -1,5 +1,7 @@
 package objects.elements;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -17,6 +19,7 @@ import static helper.Constants.PIXELS_PER_METER;
 
 public class Rope extends GameMapObject {
 
+    public static final Sound sound = Gdx.audio.newSound(Gdx.files.internal("Sounds/rope.mp3"));
     private static final TextureRegion texture = new TextureRegion(new Texture("tiles_packed.png"), 301, 128, 8, 32);
     private static final TextureRegion baseTexture = new TextureRegion(new Texture("tiles_packed.png"), 320, 96, 31, 32);
 
@@ -38,7 +41,7 @@ public class Rope extends GameMapObject {
     }
 
     @Override
-    public void render(SpriteBatch batch) {
+    public void render(SpriteBatch batch, float stateTime) {
         batch.draw(baseTexture, position.x - baseSize.width / 2.0f, position.y - baseSize.height, baseSize.width, 32);
         for (JointEdge edge : base.getJointList()) {
             Joint joint = edge.joint;

@@ -1,5 +1,7 @@
 package objects.elements;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Polygon;
@@ -10,6 +12,8 @@ import helper.BodyHelper;
 import java.awt.*;
 
 public class Ladder extends GameMapObject {
+
+    public static final Sound sound = Gdx.audio.newSound(Gdx.files.internal("Sounds/ladder.mp3"));
 
     public Ladder(Vector2 position, Dimension dimension) {
         this.position = position;
@@ -23,5 +27,5 @@ public class Ladder extends GameMapObject {
     }
 
     @Override
-    public void render(SpriteBatch batch) { }
+    public void render(SpriteBatch batch, float stateTime) { }
 }

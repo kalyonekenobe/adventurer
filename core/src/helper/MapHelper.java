@@ -32,7 +32,7 @@ public class MapHelper {
     }
 
     public OrthogonalTiledMapRenderer setupMap(String pathname) {
-        tiledMap = new TmxMapLoader().load("Maps/MapTest.tmx");
+        tiledMap = new TmxMapLoader().load(pathname);
         parseMapObjects(tiledMap.getLayers().get("objects").getObjects());
         return new OrthogonalTiledMapRenderer(tiledMap);
     }
@@ -64,27 +64,32 @@ public class MapHelper {
         int width = (int)Math.abs(minX - maxX);
         int height = (int)Math.abs(minY - maxY);
         GameMapObject object;
-        switch (polygonMapObject.getName()) {
-            case "ground":
-                object = new Ground(new Vector2(polygonMapObject.getPolygon().getX() / PIXELS_PER_METER, polygonMapObject.getPolygon().getY() / PIXELS_PER_METER - height / PIXELS_PER_METER), new Dimension(width, height));
-                break;
-            case "bomb":
-                object = new Bomb(new Vector2(polygonMapObject.getPolygon().getX() / PIXELS_PER_METER, polygonMapObject.getPolygon().getY() / PIXELS_PER_METER - height / PIXELS_PER_METER), new Dimension(width, height));
-                break;
-            case "ladder":
-                object = new Ladder(new Vector2(polygonMapObject.getPolygon().getX() / PIXELS_PER_METER, polygonMapObject.getPolygon().getY() / PIXELS_PER_METER - height / PIXELS_PER_METER), new Dimension(width, height));
-                break;
-            default:
-                object = new Ground(new Vector2(polygonMapObject.getPolygon().getX() / PIXELS_PER_METER, polygonMapObject.getPolygon().getY() / PIXELS_PER_METER - height / PIXELS_PER_METER), new Dimension(width, height));
-                break;
+        if (polygonMapObject.getName() != null) {
+            switch (polygonMapObject.getName()) {
+                case "ground":
+                    object = new Ground(new Vector2(polygonMapObject.getPolygon().getX() / PIXELS_PER_METER, polygonMapObject.getPolygon().getY() / PIXELS_PER_METER - height / PIXELS_PER_METER), new Dimension(width, height));
+                    break;
+                case "bomb":
+                    object = new Bomb(new Vector2(polygonMapObject.getPolygon().getX() / PIXELS_PER_METER, polygonMapObject.getPolygon().getY() / PIXELS_PER_METER - height / PIXELS_PER_METER), new Dimension(width, height));
+                    break;
+                case "ladder":
+                    object = new Ladder(new Vector2(polygonMapObject.getPolygon().getX() / PIXELS_PER_METER, polygonMapObject.getPolygon().getY() / PIXELS_PER_METER - height / PIXELS_PER_METER), new Dimension(width, height));
+                    break;
+                case "finish":
+                    object = new Finish(new Vector2(polygonMapObject.getPolygon().getX() / PIXELS_PER_METER, polygonMapObject.getPolygon().getY() / PIXELS_PER_METER - height / PIXELS_PER_METER), new Dimension(width, height));
+                    break;
+                default:
+                    object = new Ground(new Vector2(polygonMapObject.getPolygon().getX() / PIXELS_PER_METER, polygonMapObject.getPolygon().getY() / PIXELS_PER_METER - height / PIXELS_PER_METER), new Dimension(width, height));
+                    break;
+            }
+            Body body = level.getWorld().createBody(bodyDef);
+            Shape shape = createPolygonShape(polygonMapObject);
+            level.appendMapObjects(object);
+            body.setUserData(object);
+            body.createFixture(shape, 10000f).setUserData(object);
+            object.setBody(body);
+            shape.dispose();
         }
-        Body body = level.getWorld().createBody(bodyDef);
-        Shape shape = createPolygonShape(polygonMapObject);
-        level.appendMapObjects(object);
-        body.setUserData(object);
-        body.createFixture(shape, 10000f).setUserData(object);
-        object.setBody(body);
-        shape.dispose();
     }
 
     private Shape createPolygonShape(PolygonMapObject polygonMapObject) {

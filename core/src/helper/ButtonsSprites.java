@@ -8,13 +8,13 @@ import java.util.Map;
 
 public class ButtonsSprites {
 
-    private static final Texture texture = new Texture("buttons.png");
+    private static final Texture texture = new Texture("game_buttons.png");
 
     public enum GameButtons {
         PLAY,
         REPLAY,
-        SETTINGS,
-        MAP_EDITOR,
+        LEVELS,
+        MENU,
         QUIT
     }
 
@@ -33,8 +33,11 @@ public class ButtonsSprites {
     }
 
     public static Map<GameButtons, ButtonsBounds> buttonsBoundsMap = new HashMap<GameButtons, ButtonsBounds>() {{
-        put(GameButtons.PLAY, new ButtonsBounds(76, 146, 135, 64));
-        put(GameButtons.REPLAY, new ButtonsBounds(76, 282, 135, 64));
+        put(GameButtons.PLAY, new ButtonsBounds(0, 0, 95, 37));
+        put(GameButtons.QUIT, new ButtonsBounds(809, 0, 95, 37));
+        put(GameButtons.REPLAY, new ButtonsBounds(231, 0, 95, 37));
+        put(GameButtons.MENU, new ButtonsBounds(809, 0, 95, 37));
+        put(GameButtons.LEVELS, new ButtonsBounds(346, 0, 95, 37));
     }};
 
     public static TextureRegion getButtonSprite(GameButtons button) {
